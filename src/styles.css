@@ -72,30 +72,53 @@ body,
   cursor: default;
 }
 
-.add-resource {
-  display: flex;
-  gap: 6px;
-}
-
-.add-resource input {
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 13px;
-  min-width: 180px;
-}
-
-.add-resource input:focus {
-  outline: none;
-  border-color: #93c5fd;
-  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.35);
-}
-
 .panes {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(360px, 40%) 1fr;
+  /* grid-template-columns driven entirely by inline style from App */
   min-height: 0;
+}
+
+/* Draggable splitter gutter */
+.pane-gutter {
+  cursor: col-resize;
+  background: #e5e7eb;
+  transition: background 0.15s;
+  z-index: 10;
+}
+
+.pane-gutter:hover {
+  background: #93c5fd;
+}
+
+/* View toggle buttons in topbar */
+.view-toggles {
+  display: flex;
+  gap: 2px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f9fafb;
+}
+
+.view-toggles button {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #6b7280;
+  padding: 5px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.view-toggles button:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.view-toggles button.active {
+  background: #2563eb;
+  color: #fff;
 }
 
 .pane {
@@ -104,7 +127,7 @@ body,
 }
 
 .pane--kanban {
-  border-right: 1px solid #e5e7eb;
+  /* border provided by the gutter when both panes are shown */
   background: #f8fafc;
   overflow: auto;
 }
@@ -140,16 +163,18 @@ body,
 }
 
 .status-node__label {
-  pointer-events: none;
+  /* pointer-events kept on so double-click to rename works */
+  cursor: default;
 }
 
-/* draw.io-style connection points: subtle, emphasized on hover */
+/* draw.io-style connection points: hidden by default, visible on node hover */
 .react-flow__handle.node-handle {
   width: 9px;
   height: 9px;
   background: #fff;
   border: 1.5px solid #94a3b8;
-  opacity: 0.35;
+  opacity: 0;
+  pointer-events: none;
   transition:
     opacity 0.1s,
     transform 0.1s;
@@ -157,6 +182,7 @@ body,
 
 .status-node:hover .react-flow__handle.node-handle {
   opacity: 1;
+  pointer-events: all;
   border-color: #2563eb;
 }
 
@@ -199,7 +225,70 @@ body,
   background: #ffffffcc;
   padding: 0 4px;
   border-radius: 4px;
+  pointer-events: none; /* overridden inline on the label div for double-click */
+  cursor: default;
+}
+
+/* Inline rename input for floating edge labels */
+.floating-edge-label-edit {
+  position: absolute;
+  font-size: 12px;
+  font-weight: 600;
+  background: #fff;
+  padding: 0 4px;
+  border: 1px solid #93c5fd;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.35);
+  outline: none;
+  min-width: 80px;
+  pointer-events: all;
+}
+
+/* Note icon: top-right corner of the node, unobtrusive */
+.status-node__note-icon {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  width: 12px;
+  height: 12px;
   pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Inline rename input inside a status node */
+.status-node__label-edit {
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  width: 100%;
+  border: 1px solid #93c5fd;
+  border-radius: 4px;
+  padding: 2px 4px;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.35);
+  outline: none;
+  background: #fff;
+}
+
+/* Floating "+ Add resource" panel in the graph */
+.add-resource-panel {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.add-resource-panel__input {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  min-width: 150px;
+  outline: none;
+}
+
+.add-resource-panel__input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.35);
 }
 
 /* Kanban */

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   Background,
   ConnectionMode,
@@ -48,6 +48,7 @@ export function GraphCanvas() {
             ...n.data,
             status: card?.status ?? "todo",
             description: card?.description,
+            cardId: card?.id,
           },
         };
       }),
@@ -57,7 +58,8 @@ export function GraphCanvas() {
   const styledEdges = useMemo<Edge[]>(
     () =>
       edges.map((e) => {
-        const status: Status = cardByElement[e.id]?.status ?? "todo";
+        const card = cardByElement[e.id];
+        const status: Status = card?.status ?? "todo";
         const color = STATUS_COLOR[status];
         return {
           ...e,
@@ -65,6 +67,7 @@ export function GraphCanvas() {
           animated: false, // solid lines, not dashed
           style: { ...e.style, stroke: color, strokeWidth: 2.5 },
           markerEnd: { type: MarkerType.ArrowClosed, color },
+          data: { ...e.data, cardId: card?.id },
         };
       }),
     [edges, cardByElement],
@@ -85,6 +88,9 @@ export function GraphCanvas() {
     >
       <Panel position="top-right">
         <LayoutButton />
+      </Panel>
+      <Panel position="top-left">
+        <AddResourcePanel />
       </Panel>
       <Background />
       <Controls />
@@ -107,5 +113,64 @@ function LayoutButton() {
     >
       ⤢ Auto-organize
     </button>
+  );
+}
+
+function AddResourcePanel() {
+  const addResource = useStore((s) => s.addResource);
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const openPanel = () => {
+    setOpen(true);
+    // focus after next paint
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  const submit = () => {
+    const title = value.trim();
+    if (title) addResource(title);
+    setValue("");
+    setOpen(false);
+  };
+
+  if (!open) {
+    return (
+      <button className="organize-btn" onClick={openPanel}>
+        + Add resource
+      </button>
+    );
+  }
+
+  return (
+    <div className="add-resource-panel nodrag nopan">
+      <input
+        ref={inputRef}
+        className="add-resource-panel__input"
+        placeholder="Resource name…"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") { e.preventDefault(); submit(); }
+          if (e.key === "Escape") { e.preventDefault(); setValue(""); setOpen(false); }
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+      />
+      <button
+        className="organize-btn"
+        onClick={submit}
+        disabled={!value.trim()}
+      >
+        Add
+      </button>
+      <button
+        className="organize-btn"
+        onClick={() => { setValue(""); setOpen(false); }}
+        title="Cancel"
+      >
+        ✕
+      </button>
+    </div>
   );
 }

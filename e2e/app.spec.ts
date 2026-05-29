@@ -56,10 +56,12 @@ test("moving a card recolors its node live", async ({ page }) => {
   await expect(statusNode(page, "Application")).toHaveCSS("border-color", GREEN);
 });
 
-test("adding a resource via the toolbar form", async ({ page }) => {
-  const input = page.getByLabel("New resource name");
+test("adding a resource via the floating map button", async ({ page }) => {
+  // The control lives on the map: a "+ Add resource" button that reveals an input.
+  await page.getByRole("button", { name: "+ Add resource" }).click();
+  const input = page.getByPlaceholder("Resource name…");
   await input.fill("S3 Bucket");
-  await page.getByRole("button", { name: "+ Add" }).click();
+  await input.press("Enter");
 
   // A card appears under "Not deployed".
   await expect(
@@ -67,8 +69,8 @@ test("adding a resource via the toolbar form", async ({ page }) => {
   ).toBeVisible();
   // A 4th graph node appears.
   await expect(page.locator(".status-node")).toHaveCount(4);
-  // The input is cleared.
-  await expect(input).toHaveValue("");
+  // The panel collapses back to the button.
+  await expect(page.getByRole("button", { name: "+ Add resource" })).toBeVisible();
 });
 
 test("add, save and remove a card description", async ({ page }) => {
@@ -107,6 +109,73 @@ test("inline rename propagates to the graph node", async ({ page }) => {
   // The graph node label updates to the new title.
   await expect(statusNode(page, "EKS v2")).toBeVisible();
   await expect(page.locator(".status-node__label", { hasText: "EKS Cluster" })).toHaveCount(0);
+});
+
+test("nodes with a description show the note icon", async ({ page }) => {
+  // All 3 seeded nodes have descriptions, so each shows the corner note icon.
+  await expect(page.locator(".status-node__note-icon")).toHaveCount(3);
+  await expect(
+    statusNode(page, "EKS Cluster").locator(".status-node__note-icon"),
+  ).toBeVisible();
+});
+
+test("double-click renames a node directly on the map", async ({ page }) => {
+  await statusNode(page, "RDS").locator(".status-node__label").dblclick();
+
+  const edit = page.locator(".status-node__label-edit");
+  await expect(edit).toBeVisible();
+  await edit.fill("RDS Aurora");
+  await edit.press("Enter");
+
+  // Node label updates...
+  await expect(statusNode(page, "RDS Aurora")).toBeVisible();
+  // ...and so does the linked kanban card.
+  await expect(card(page, "RDS Aurora")).toBeVisible();
+});
+
+test("double-click renames an edge label directly on the map", async ({ page }) => {
+  await page.locator(".floating-edge-label", { hasText: "runs on" }).dblclick();
+
+  const edit = page.locator(".floating-edge-label-edit");
+  await expect(edit).toBeVisible();
+  await edit.fill("deployed on");
+  await edit.press("Enter");
+
+  await expect(
+    page.locator(".floating-edge-label", { hasText: "deployed on" }),
+  ).toBeVisible();
+});
+
+test("dragging the gutter resizes the panes", async ({ page }) => {
+  const kanban = page.locator(".pane--kanban");
+  const before = (await kanban.boundingBox())!.width;
+
+  const gutter = page.locator(".pane-gutter");
+  const box = (await gutter.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 200, box.y + box.height / 2, { steps: 10 });
+  await page.mouse.up();
+
+  await expect
+    .poll(async () => (await kanban.boundingBox())!.width)
+    .toBeGreaterThan(before + 50);
+});
+
+test("toggles hide and restore the panes", async ({ page }) => {
+  const kanbanBtn = page.getByRole("button", { name: "Kanban" });
+
+  // Hide the kanban: only the map remains, no gutter.
+  await kanbanBtn.click();
+  await expect(page.locator(".pane--kanban")).toHaveCount(0);
+  await expect(page.locator(".pane--graph")).toBeVisible();
+  await expect(page.locator(".pane-gutter")).toHaveCount(0);
+
+  // Click again to restore both panes.
+  await kanbanBtn.click();
+  await expect(page.locator(".pane--kanban")).toBeVisible();
+  await expect(page.locator(".pane--graph")).toBeVisible();
+  await expect(page.locator(".pane-gutter")).toBeVisible();
 });
 
 test("auto-organize repositions nodes", async ({ page }) => {
