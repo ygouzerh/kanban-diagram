@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Infra Kanban Map — a single-user, client-only PoC (Vite + React 19 + TypeScript) where a kanban board's card statuses drive the colors of a live `@xyflow/react` diagram. No backend; state persists to `localStorage`.
+Kanban Diagram — a single-user, client-only PoC (Vite + React 19 + TypeScript) where a kanban board's card statuses drive the colors of a live `@xyflow/react` diagram. No backend; state persists to `localStorage`.
 
 ## Commands
 
@@ -28,4 +28,4 @@ npm test          # Playwright e2e tests (headless; reuses/starts the dev server
 - **`connectionMode` is `Loose`** — every handle acts as both source and target, so any handle can connect to any handle.
 - **In-map editing inputs need `nodrag nopan`** classes (and `stopPropagation` on mouse/dblclick) so React Flow doesn't hijack typing/dragging while inline-editing a node or edge label. The same applies to the floating add-resource panel.
 - **`pendingNameCardId`** is a transient store field (excluded from persistence via `partialize`) used to auto-focus the inline title editor on a freshly drawn relationship's card.
-- **Persistence:** `persist` with `name: "infra-kanban-map"` and `partialize` persisting only `{ nodes, edges, cards }`.
+- **Persistence:** `persist` with `name: "kanban-diagram"` and `partialize` persisting only `{ nodes, edges, cards }`.

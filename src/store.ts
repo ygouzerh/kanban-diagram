@@ -219,7 +219,7 @@ export const useStore = create<AppState>()(
         const app = uid();
         const rds = uid();
         const eksApp = uid();
-        const irsa = uid();
+        const netAccess = uid();
         set({
           nodes: [
             { id: eks, position: { x: 360, y: 60 }, data: { label: "EKS Cluster" } },
@@ -235,10 +235,10 @@ export const useStore = create<AppState>()(
               markerEnd: { type: MarkerType.ArrowClosed },
             },
             {
-              id: irsa,
+              id: netAccess,
               source: eks,
               target: rds,
-              label: "IRSA access",
+              label: "network access",
               markerEnd: { type: MarkerType.ArrowClosed },
             },
           ],
@@ -247,7 +247,7 @@ export const useStore = create<AppState>()(
             { id: uid(), title: "Application", status: "todo", elementId: app, elementType: "node", description: "Helm release, not yet deployed to the cluster." },
             { id: uid(), title: "RDS", status: "done", elementId: rds, elementType: "node", description: "Postgres 16, private subnets, encrypted at rest." },
             { id: uid(), title: "App runs on EKS", status: "todo", elementId: eksApp, elementType: "edge" },
-            { id: uid(), title: "IRSA: EKS to RDS", status: "in_progress", elementId: irsa, elementType: "edge", description: "Binding the RDS-access IAM policy to the app service account via IRSA." },
+            { id: uid(), title: "Network access", status: "in_progress", elementId: netAccess, elementType: "edge", description: "Security group rule allowing EKS pods to reach RDS on TCP 5432." },
           ],
         });
       },
@@ -255,7 +255,7 @@ export const useStore = create<AppState>()(
       reset: () => set({ nodes: [], edges: [], cards: [] }),
     }),
     {
-      name: "infra-kanban-map",
+      name: "kanban-diagram",
       partialize: (s) => ({ nodes: s.nodes, edges: s.edges, cards: s.cards }),
     },
   ),

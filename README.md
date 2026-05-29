@@ -1,4 +1,4 @@
-# Infra Kanban Map
+# Kanban Diagram
 
 A single-page proof-of-concept for managing an infrastructure project as a kanban board whose statuses drive a live diagram. The board (left) and a React Flow graph (right) share one store: each card is linked to one diagram element (a resource node or a relationship edge), and the card's status sets that element's color. Move a card between columns and the node or edge recolors instantly. It's the same idea as a draw.io diagram, but the colors are derived from where the work sits on the board.
 
@@ -11,7 +11,7 @@ npm run build    # type-check (tsc -b) + production build
 npm test         # Playwright end-to-end tests (headless)
 ```
 
-It's a single-user PoC with no backend. State persists to your browser's `localStorage` (key `infra-kanban-map`), so the board is per-browser and not shared.
+It's a single-user PoC with no backend. State persists to your browser's `localStorage` (key `kanban-diagram`), so the board is per-browser and not shared.
 
 ## How it works
 
