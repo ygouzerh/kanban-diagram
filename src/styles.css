@@ -1,0 +1,288 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #111827;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.topbar .hint {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.topbar .spacer {
+  flex: 1;
+}
+
+.topbar button {
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.topbar button:hover {
+  background: #f3f4f6;
+}
+
+.topbar button.danger {
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.topbar button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.add-resource {
+  display: flex;
+  gap: 6px;
+}
+
+.add-resource input {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  min-width: 180px;
+}
+
+.add-resource input:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.35);
+}
+
+.panes {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(360px, 40%) 1fr;
+  min-height: 0;
+}
+
+.pane {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pane--kanban {
+  border-right: 1px solid #e5e7eb;
+  background: #f8fafc;
+  overflow: auto;
+}
+
+.pane--graph {
+  background: #fdfdfd;
+}
+
+.organize-btn {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.organize-btn:hover {
+  background: #f3f4f6;
+}
+
+/* Kanban */
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 12px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  min-height: 140px;
+}
+
+.column--over {
+  outline: 2px dashed #93c5fd;
+  outline-offset: -2px;
+}
+
+.column__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.column__head .count {
+  margin-left: auto;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.column__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  flex: 1;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: grab;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card__note {
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: #9ca3af;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.card__note--active {
+  color: #2563eb;
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.card__desc-edit {
+  width: 100%;
+  min-height: 52px;
+  resize: vertical;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 12px;
+}
+
+.card__desc-edit:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.35);
+}
+
+.card__tooltip {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 8px;
+  right: 8px;
+  margin-top: 6px;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 8px 10px;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  white-space: pre-wrap;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.card:hover .card__tooltip {
+  display: block;
+}
+
+.card__title {
+  flex: 1;
+  font-size: 13px;
+}
+
+.card__del {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.card__del:hover {
+  color: #ef4444;
+}
+
+.tag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.tag--node {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.tag--edge {
+  background: #ecfeff;
+  color: #0e7490;
+}
