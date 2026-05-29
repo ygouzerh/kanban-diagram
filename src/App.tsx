@@ -13,7 +13,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <strong>Infra Kanban Map</strong>
+        <span className="topbar__title">Infra Kanban Map</span>
         <span className="hint">
           drag from a node's handle to link resources · move cards to change status
         </span>

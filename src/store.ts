@@ -18,6 +18,8 @@ interface AppState {
   nodes: Node[];
   edges: Edge[];
   cards: Card[];
+  // Transient: id of a freshly-created card to auto-edit inline (not persisted).
+  pendingNameCardId: string | null;
 
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
@@ -28,6 +30,7 @@ interface AppState {
   renameCard: (cardId: string, title: string) => void;
   setCardDescription: (cardId: string, description: string) => void;
   deleteCard: (cardId: string) => void;
+  clearPendingName: () => void;
 
   autoLayout: () => void;
   loadExample: () => void;
@@ -46,6 +49,7 @@ export const useStore = create<AppState>()(
       nodes: [],
       edges: [],
       cards: [],
+      pendingNameCardId: null,
 
       onNodesChange: (changes) => {
         const removed = changes
@@ -76,10 +80,9 @@ export const useStore = create<AppState>()(
       },
 
       onConnect: (conn) => {
-        const title =
-          window.prompt("Name this relationship", "connects to")?.trim() ||
-          "connects to";
+        const title = "new link";
         const edgeId = uid();
+        const cardId = uid();
         const edge: Edge = {
           id: edgeId,
           source: conn.source,
@@ -94,13 +97,15 @@ export const useStore = create<AppState>()(
           cards: [
             ...s.cards,
             {
-              id: uid(),
+              id: cardId,
               title,
               status: "todo",
               elementId: edgeId,
               elementType: "edge",
             },
           ],
+          // Trigger inline naming of the new link's card.
+          pendingNameCardId: cardId,
         }));
       },
 
@@ -181,6 +186,8 @@ export const useStore = create<AppState>()(
                   s.edges,
           };
         }),
+
+      clearPendingName: () => set({ pendingNameCardId: null }),
 
       autoLayout: () =>
         set((s) => {

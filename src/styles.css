@@ -3,8 +3,19 @@
 }
 
 :root {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: #111827;
+}
+
+.topbar__title {
+  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  background: linear-gradient(90deg, #2563eb, #0e7490);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 html,
@@ -116,12 +127,100 @@ body,
   background: #f3f4f6;
 }
 
+/* Custom graph node */
+.status-node {
+  position: relative;
+  min-width: 150px;
+  padding: 10px 14px;
+  border: 2px solid #9ca3af;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  color: #111827;
+}
+
+.status-node__label {
+  pointer-events: none;
+}
+
+/* draw.io-style connection points: subtle, emphasized on hover */
+.react-flow__handle.node-handle {
+  width: 9px;
+  height: 9px;
+  background: #fff;
+  border: 1.5px solid #94a3b8;
+  opacity: 0.35;
+  transition:
+    opacity 0.1s,
+    transform 0.1s;
+}
+
+.status-node:hover .react-flow__handle.node-handle {
+  opacity: 1;
+  border-color: #2563eb;
+}
+
+.react-flow__handle.node-handle:hover {
+  background: #2563eb;
+  transform: scale(1.4);
+}
+
+/* Node hover tooltip (shows the linked card's description) */
+.status-node__tip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 240px;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  white-space: pre-wrap;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.status-node:hover .status-node__tip {
+  display: block;
+}
+
+.floating-edge-label {
+  position: absolute;
+  font-size: 12px;
+  font-weight: 600;
+  background: #ffffffcc;
+  padding: 0 4px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
 /* Kanban */
 .kanban {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 10px;
   padding: 12px;
+}
+
+.kanban__row {
+  display: grid;
+  gap: 10px;
+}
+
+.kanban__row--main {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.kanban__row--blocked {
+  grid-template-columns: 1fr;
 }
 
 .column {
@@ -210,6 +309,12 @@ body,
   background: #eff6ff;
 }
 
+.card__desc {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .card__desc-edit {
   width: 100%;
   min-height: 52px;
@@ -225,6 +330,35 @@ body,
   outline: none;
   border-color: #93c5fd;
   box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.35);
+}
+
+.card__desc-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card__desc-hint {
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+.card__desc-remove {
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  background: #fff;
+  border-radius: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.card__desc-remove:hover {
+  background: #fef2f2;
 }
 
 .card__tooltip {
@@ -253,6 +387,22 @@ body,
 .card__title {
   flex: 1;
   font-size: 13px;
+}
+
+.card__title-edit {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.card__title-edit:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.35);
 }
 
 .card__del {

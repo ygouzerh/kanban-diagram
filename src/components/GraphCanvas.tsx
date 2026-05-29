@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import {
   Background,
+  ConnectionMode,
   Controls,
   MarkerType,
   MiniMap,
@@ -8,11 +9,19 @@ import {
   ReactFlow,
   useReactFlow,
   type Edge,
+  type EdgeTypes,
   type Node,
+  type NodeTypes,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useStore } from "../store";
-import { STATUS_COLOR, type Status } from "../types";
+import { STATUS_COLOR, type Card, type Status } from "../types";
+import { StatusNode } from "./StatusNode";
+import { FloatingEdge } from "./FloatingEdge";
+
+// Stable references so React Flow doesn't warn / re-create on each render.
+const nodeTypes: NodeTypes = { status: StatusNode };
+const edgeTypes: EdgeTypes = { floating: FloatingEdge };
 
 export function GraphCanvas() {
   const nodes = useStore((s) => s.nodes);
@@ -22,52 +31,52 @@ export function GraphCanvas() {
   const onEdgesChange = useStore((s) => s.onEdgesChange);
   const onConnect = useStore((s) => s.onConnect);
 
-  const statusByElement = useMemo(() => {
-    const m: Record<string, Status> = {};
-    for (const c of cards) m[c.elementId] = c.status;
+  const cardByElement = useMemo(() => {
+    const m: Record<string, Card> = {};
+    for (const c of cards) m[c.elementId] = c;
     return m;
   }, [cards]);
 
   const styledNodes = useMemo<Node[]>(
     () =>
       nodes.map((n) => {
-        const color = STATUS_COLOR[statusByElement[n.id] ?? "todo"];
+        const card = cardByElement[n.id];
         return {
           ...n,
-          style: {
-            ...n.style,
-            background: `${color}22`,
-            border: `2px solid ${color}`,
-            borderRadius: 8,
-            color: "#111827",
-            fontWeight: 600,
-            padding: 8,
+          type: "status",
+          data: {
+            ...n.data,
+            status: card?.status ?? "todo",
+            description: card?.description,
           },
         };
       }),
-    [nodes, statusByElement],
+    [nodes, cardByElement],
   );
 
   const styledEdges = useMemo<Edge[]>(
     () =>
       edges.map((e) => {
-        const status = statusByElement[e.id] ?? "todo";
+        const status: Status = cardByElement[e.id]?.status ?? "todo";
         const color = STATUS_COLOR[status];
         return {
           ...e,
-          animated: status === "in_progress",
+          type: "floating",
+          animated: false, // solid lines, not dashed
           style: { ...e.style, stroke: color, strokeWidth: 2.5 },
-          labelStyle: { fill: color, fontWeight: 600 },
           markerEnd: { type: MarkerType.ArrowClosed, color },
         };
       }),
-    [edges, statusByElement],
+    [edges, cardByElement],
   );
 
   return (
     <ReactFlow
       nodes={styledNodes}
       edges={styledEdges}
+      nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
+      connectionMode={ConnectionMode.Loose}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
